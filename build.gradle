@@ -75,8 +75,8 @@ sauceLabs {
     }
 
     account {
-        username = GEB_SAUCE_LABS_USER
-        accessKey = GEB_SAUCE_LABS_ACCESS_PASSWORD
+        username = GEB_SAUCE_LABS_USER ?: ""
+        accessKey = GEB_SAUCE_LABS_ACCESS_PASSWORD ?: ""
     }
 }
 
