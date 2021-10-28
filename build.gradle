@@ -1,0 +1,142 @@
+
+buildscript {
+    repositories {
+       mavenCentral()
+    }
+    dependencies {
+       classpath 'org.gebish:geb-gradle:5.0'
+    }
+}
+
+plugins {
+    // Apply the groovy Plugin to add support for Groovy.
+    id 'groovy'
+    id 'com.github.erdi.webdriver-binaries' version '2.2'
+}
+
+apply plugin: "geb-saucelabs"
+
+repositories {
+    mavenCentral()
+}
+
+ext {
+    drivers = ["firefox", "chrome", "chromeHeadless"]
+    driversMemorial = ["firefox", "chrome"]
+    platforms = ["Windows"]
+
+    gebVersion = '5.0'
+    seleniumVersion = '3.141.59'
+    groovyVersion = '3.0.8'
+    groovywsliteVersion = '1.1.2'
+    spockCoreVersion = '2.0-groovy-3.0'
+
+    chromeDriverVersion = '94.0.4606.61'
+    geckoDriverVersion = '0.29.1'
+}
+
+sourceSets {
+    apiTest {}
+    memorialTest {}
+}
+
+configurations {
+    memorialTestImplementation.extendsFrom implementation
+    memorialTestRuntimeOnly.extendsFrom runtimeOnly
+}
+
+sauceLabs {
+    useTunnel = false
+
+    browsers {
+        driversMemorial.each { driver ->
+            platforms.each { platform ->
+                "memorialSauceLabs${platform}${driver}" {
+                    capabilities (
+                        browserName: driver,
+                        platformName: "Windows 10",
+                    )
+                }
+             }
+        }
+    }
+
+    driversMemorial.each { driver ->
+        platforms.each { platform ->
+            tasks.named("memorialSauceLabs${platform}${driver}Test") {
+                useJUnitPlatform()
+                maxParallelForks = Runtime.runtime.availableProcessors().intdiv(2) ?: 1
+                outputs.upToDateWhen { false }  // Always run tests
+
+                testClassesDirs = sourceSets.memorialTest.output.classesDirs
+                classpath = sourceSets.memorialTest.runtimeClasspath
+            }
+        }
+    }
+
+    account {
+        username = GEB_SAUCE_LABS_USER
+        accessKey = GEB_SAUCE_LABS_ACCESS_PASSWORD
+    }
+}
+
+dependencies {
+
+    testImplementation "org.codehaus.groovy:groovy-all:${groovyVersion}"
+    testImplementation "org.spockframework:spock-core:${spockCoreVersion}"
+    testImplementation "org.gebish:geb-spock:${gebVersion}"
+    testImplementation "org.seleniumhq.selenium:selenium-firefox-driver:${seleniumVersion}"
+    testImplementation "org.seleniumhq.selenium:selenium-chrome-driver:${seleniumVersion}"
+    testImplementation "org.seleniumhq.selenium:selenium-support:${seleniumVersion}"
+    testImplementation "com.github.groovy-wslite:groovy-wslite:${groovywsliteVersion}"
+
+    apiTestImplementation "org.codehaus.groovy:groovy-all:${groovyVersion}"
+    apiTestImplementation "org.spockframework:spock-core:${spockCoreVersion}"
+    apiTestImplementation "com.github.groovy-wslite:groovy-wslite:${groovywsliteVersion}"
+
+    memorialTestImplementation "org.codehaus.groovy:groovy-all:${groovyVersion}"
+    memorialTestImplementation "org.codehaus.groovy:groovy-yaml:${groovyVersion}"
+    memorialTestImplementation "org.spockframework:spock-core:${spockCoreVersion}"
+    memorialTestImplementation "org.gebish:geb-spock:${gebVersion}"
+    memorialTestImplementation "org.seleniumhq.selenium:selenium-firefox-driver:${seleniumVersion}"
+    memorialTestImplementation "org.seleniumhq.selenium:selenium-chrome-driver:${seleniumVersion}"
+    memorialTestImplementation "org.seleniumhq.selenium:selenium-support:${seleniumVersion}"
+    memorialTestImplementation "com.github.groovy-wslite:groovy-wslite:${groovywsliteVersion}"
+
+    sauceConnect "com.saucelabs:ci-sauce:1.153"
+}
+
+webdriverBinaries {
+    chromedriver chromeDriverVersion
+    geckodriver geckoDriverVersion
+}
+
+tasks.register('apiTest', Test) {
+    useJUnitPlatform()
+
+    testClassesDirs = sourceSets.apiTest.output.classesDirs
+    classpath = sourceSets.apiTest.runtimeClasspath
+}
+
+drivers.each { driver ->
+    tasks.register("memorial${driver}Test", Test) {
+        useJUnitPlatform()
+        outputs.upToDateWhen { false }  // Always run tests
+
+        testClassesDirs = sourceSets.memorialTest.output.classesDirs
+        classpath = sourceSets.memorialTest.runtimeClasspath
+
+        systemProperty "geb.build.reportsDir", reporting.file("geb/${name}")
+        systemProperty "geb.env", driver
+    }
+}
+
+tasks.register("memorialSauceLabsTest", Test) {
+    dependsOn driversMemorial.collect { driver -> platforms.collect { platform -> tasks["memorialSauceLabs${platform}${driver}Test"] } }
+}
+
+test {
+     dependsOn drivers.collect { tasks["memorial${it}Test"] }
+     dependsOn apiTest
+     enabled = false
+}
