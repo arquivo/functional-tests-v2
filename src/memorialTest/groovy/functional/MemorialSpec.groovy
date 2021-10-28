@@ -27,7 +27,7 @@ class MemorialSpec extends GebSpec {
         }
     }
 
-    def "All memorial website are available"() {
+    def "A memorial website is available"() {
         when: "accessing memorial's URL"
         def url = config.url.toURL()
 
