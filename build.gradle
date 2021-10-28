@@ -55,7 +55,8 @@ sauceLabs {
                     capabilities (
                         browserName: driver,
                         platformName: "Windows 10",
-                        name: "memorial${platform}${driver}Test".toString()
+                        name: "memorial${platform}${driver}Test".toString(),
+                        build: "memorial${platform}${driver}Test".toString()
                     )
                 }
              }
