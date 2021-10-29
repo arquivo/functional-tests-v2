@@ -1,1 +1,1 @@
-[![Sauce Test Status](https://app.saucelabs.com/buildstatus/ArquivoPT)](https://app.saucelabs.com/u/ArquivoPT)
+[![Build Status](https://saucelabs.com/browser-matrix/ArquivoPT.svg)](https://app.saucelabs.com/builds/vdc/7545e82974d732729d37fe6600820e1f)
