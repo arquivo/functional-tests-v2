@@ -52,11 +52,11 @@ sauceLabs {
         driversMemorial.each { driver ->
             platforms.each { platform ->
                 "memorialSauceLabs${platform}${driver}" {
-                    capabilities (
+                    capabilities(
                         browserName: driver,
                         platformName: "Windows 10",
-                        name: "memorial${platform}${driver}Test".toString(),
-                        build: "memorial${platform}${driver}Test".toString()
+                        name: "memorialSauceLabs${platform}${driver}".toString(),
+                        build: "memorialSauceLabs${platform}${driver}".toString()
                     )
                 }
              }
@@ -66,6 +66,7 @@ sauceLabs {
     driversMemorial.each { driver ->
         platforms.each { platform ->
             tasks.named("memorialSauceLabs${platform}${driver}Test") {
+                System.setProperty('taskName', "memorialSauceLabs${platform}${driver}Test")
                 useJUnitPlatform()
                 maxParallelForks = Runtime.runtime.availableProcessors().intdiv(2) ?: 1
                 outputs.upToDateWhen { false }  // Always run tests
@@ -77,8 +78,8 @@ sauceLabs {
     }
 
     account {
-        username = GEB_SAUCE_LABS_USER
-        accessKey = GEB_SAUCE_LABS_ACCESS_PASSWORD
+        username = SAUCE_LABS_USER
+        accessKey = SAUCE_LABS_ACCESS_PASSWORD
     }
 }
 
