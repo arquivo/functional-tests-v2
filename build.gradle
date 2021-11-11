@@ -25,7 +25,7 @@ ext {
     driversMemorial = ["firefox", "chrome"]
     platforms = ["Windows"]
 
-    gebVersion = '5.0'
+    gebVersion = '5.1'
     seleniumVersion = '3.141.59'
     groovyVersion = '3.0.8'
     groovywsliteVersion = '1.1.2'
@@ -78,8 +78,8 @@ sauceLabs {
     }
 
     account {
-        username = SAUCE_LABS_USER
-        accessKey = SAUCE_LABS_ACCESS_PASSWORD
+        username = System.getProperty("SAUCE_LABS_USER")
+        accessKey = System.getProperty("SAUCE_LABS_ACCESS_PASSWORD")
     }
 }
 

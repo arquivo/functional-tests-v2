@@ -6,23 +6,19 @@ import geb.driver.SauceLabsDriverFactory
 def sauceLabsBrowser = System.getProperty("geb.saucelabs.browser")
 if (sauceLabsBrowser) {
     def configs = sauceLabsBrowser.split(System.lineSeparator())
-    def sauceLabsBrowserConfig = ""
     def desiredCaps = [:]
     configs.each {
-        if ( it =~ "browserName" || it =~ "platformName") {
-            sauceLabsBrowserConfig += it + System.lineSeparator()
-        }
-        else {
             def (k,v) = it.split("=")
             desiredCaps[k] = v
-        }
     }
     driver = {
        def username = System.getenv("GEB_SAUCE_LABS_USER")
        assert username
+       desiredCaps["username"] = username
        def accessKey = System.getenv("GEB_SAUCE_LABS_ACCESS_PASSWORD")
        assert accessKey
-       new SauceLabsDriverFactory().create(sauceLabsBrowserConfig, username, accessKey, ["sauce:options":desiredCaps])
+       desiredCaps["accessKey"] = accessKey
+       new SauceLabsDriverFactory().create(["sauce:options":desiredCaps])
     }
 }
 
