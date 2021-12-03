@@ -43,13 +43,15 @@ class MemorialSpec extends GebSpec {
         getCurrentUrl() =~ getWaybackURL(config)
 
         and: "we can confirm the text inside the iframe"
-        withFrame($("#replay_iframe")) {
-            if (config.waybackTextXPath) {
-                waitFor {
-                    $(By.xpath(config.waybackTextXPath)).text() =~ config.waybackText
+        withFrame($("#replay-in-iframe")) {
+            withFrame($("#replay_iframe")) {
+                if (config.waybackTextXPath) {
+                    waitFor {
+                        $(By.xpath(config.waybackTextXPath)).text() =~ config.waybackText
+                    }
+                } else {
+                    title == config.title
                 }
-            } else {
-                title == config.title
             }
         }
 
